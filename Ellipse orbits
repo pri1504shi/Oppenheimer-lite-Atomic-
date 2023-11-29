@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+user_energy = float(input("Enter the energy (negative value for ellipse orbit): "))
+user_eccentricity = float(input("Enter the eccentricity (less than 1): "))
+# Constants
+G = 6.67430e-11 # Gravitational constant (m^3/kg/s^2)
+M = 5.972e24 # Mass of Earth (kg)
+# semi-major axis (a) values
+a_values = np.linspace(1e7, 1e9, 10) 
+# orbital parameters
+eccentricities = np.linspace(1.01, user_eccentricity, 10)
+energy_values = np.empty((len(a_values), len(eccentricities)))
+theta = np.linspace(-np.pi, np.pi, 1000)
+X = np.empty((len(a_values), len(theta)))
+Y = np.empty((len(a_values), len(theta)))
+Z = np.empty((len(a_values), len(theta)))
+for i, a in enumerate(a_values):
+ for j, e in enumerate(eccentricities):
+ b = a * np.sqrt(1-e**2)
+ r = a * (1-e**2)/(1 + e * np.cos(theta))
+ X[i, :] = r * np.cos(theta)
+ Y[i, :] = r * np.sin(theta)
+ Z[i, :] = np.zeros_like(theta)
+# Create a 3D plot
+fig = plt.figure()
+6
+ax = fig.add_subplot(111, projection='3d')
+for i in range(len(a_values)):
+ ax.plot(X[i, :], Y[i, :], Z[i, :])
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title(f'Ellipse Orbits')
+plt.show()
