@@ -1,0 +1,26 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+G = 6.67430e-11 # Gravitational constant (m^3/kg/s^2)
+M = 5.972e24 # Mass of Earth (kg)
+e=1
+E=1e-20
+p=-G*M/2*E
+theta = np.linspace(-np.pi, np.pi, 1000)
+r = p/(1+np.cos(theta))
+x = r * np.cos(theta)
+y = r * np.sin(theta)
+z = np.zeros_like(theta)
+# Create a 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(x, y, z)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+# Set title
+ax.set_title(f'Parabola Orbits')
+ax.grid(True, linestyle='--', alpha=0.5)
+ax.view_init(elev=20, azim=30)
+# Show the plot
+plt.show()
