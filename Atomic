@@ -1,0 +1,84 @@
+import numpy as np
+import scipy.integrate as integrate
+import matplotlib.pyplot as plt
+
+
+hbar =1
+m = 1
+e=1.6e-19
+Lx = 10
+Ly = 11
+x = np.linspace(0, Lx, 100)
+y = np.linspace(0, Ly, 100)
+nx=1
+ny=2
+Vo=10
+
+def unperturbed_energy(nx, ny,Lx,Ly):
+    Ex = (hbar**2 * np.pi**2 * nx**2) / (2 * m * Lx**2)
+    Ey = (hbar**2 * np.pi**2 * ny**2) / (2 * m * Ly**2)
+    return Ex + Ey
+
+def perturbing_potential(x, y):
+    return (-e*x)*Vo
+
+def integrand(x, y, nx, ny):
+    psi_unperturbed_x = np.sin(nx * np.pi * x / Lx)
+    psi_unperturbed_y = np.sin(ny * np.pi * y / Ly)
+    return psi_unperturbed_x * psi_unperturbed_y * perturbing_potential(x, y)
+
+#creating 2-D array for potential
+V= np.zeros((len(x),len(y)))
+for i in range(len(x)):
+  for j in range(len(y)):
+    V[i,j] = perturbing_potential(x[i], y[j])
+X, Y = np.meshgrid(x, y)
+
+#creating 2-D array for unperturbed energy
+E = np.zeros((len(x), len(y)))  # Initialize E as a 2D array of zeros
+for i in range(len(x)):
+    for j in range(len(y)):
+        E[i, j] = unperturbed_energy(nx, ny, Lx, Ly)
+energy_correction, _ = integrate.dblquad(integrand, 0, Lx, 0, Ly, args=(nx, ny))
+
+corrected_energy = unperturbed_energy(nx,ny,Lx,Ly) + integrate.dblquad(integrand, 0, Lx, 0, Ly, args=(nx, ny))[0]
+C= np.zeros((len(x),len(y)))
+for i in range(len(x)):
+  for j in range(len(y)):
+    C[i,j]= unperturbed_energy(nx,ny,Lx,Ly) + integrate.dblquad(integrand, 0, Lx, 0, Ly, args=(nx, ny))[0]
+
+
+# Create 3D plots for the perturbation potential, energy, and corrected energy
+fig = plt.figure(figsize=(12,8))
+
+print('Unperturbed Energy:', unperturbed_energy(nx,ny,Lx,Ly))
+print('Correction:', energy_correction)
+print('Corrected Energy:', corrected_energy)
+
+
+# Perturbation Potential
+ax1 = fig.add_subplot(131, projection='3d')
+ax1.plot_surface(X, Y, V, cmap='viridis')
+ax1.set_title('Perturbation')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_zlabel('V(x, y)')
+
+# Unperturbed Energy
+ax2 = fig.add_subplot(132, projection='3d')
+ax2.plot_surface(X, Y, E, cmap='viridis')
+ax2.set_title('Unperturbed Energy')
+ax2.set_xlabel('nx')
+ax2.set_ylabel('ny')
+ax2.set_zlabel('E(nx, ny)')
+
+# Corrected Energy
+ax3 = fig.add_subplot(133, projection='3d')
+ax3.plot_surface(X, Y, C, cmap='viridis')
+ax3.set_title('Corrected Energy')
+ax3.set_xlabel('nx')
+ax3.set_ylabel('ny')
+ax3.set_zlabel('E_corrected(nx, ny)')
+
+plt.tight_layout()
+plt.show()
