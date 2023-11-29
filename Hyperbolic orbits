@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+user_energy = float(input("Enter the energy (positive value for hyperbolic orbit): "))
+user_eccentricity = float(input("Enter the eccentricity (greater than 1): "))
+G = 6.67430e-11 # Gravitational constant (m^3/kg/s^2)
+M = 5.972e24 # Mass of Earth (kg)
+a_values = np.linspace(1e7, 1e9, 100) # Adjust the range as needed
+#orbital parameters
+eccentricities = np.linspace(1.01, user_eccentricity, 100)
+energy_values = np.empty((len(a_values), len(eccentricities)))
+theta = np.linspace(-np.pi, np.pi, 1000)
+X = np.empty((len(a_values), len(theta)))
+Y = np.empty((len(a_values), len(theta)))
+Z = np.empty((len(a_values), len(theta)))
+for i, a in enumerate(a_values):
+ for j, e in enumerate(eccentricities):
+ # semi-minor axis (b) based on eccentricity
+ b = a * np.sqrt(e**2 - 1)
+ r = a *(1 + e * np.cos(theta))
+ X[i, :] = r * np.cos(theta)
+ Y[i, :] = r * np.sin(theta)
+ Z[i, :] = np.zeros_like(theta)
+7
+# Create a 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+# Plot the hyperbolic orbits in 3D space
+for i in range(len(a_values)):
+ ax.plot(X[i, :], Y[i, :], Z[i, :])
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title(f'Hyperbola Orbits')
+# Show the plot
+plt.show()
