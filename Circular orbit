@@ -1,0 +1,22 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+r = float(input("Enter the radius of the circular orbit: "))
+theta = np.linspace(-np.pi, np.pi, 1000)
+x = r * np.cos(theta)
+y = r * np.sin(theta)
+z= np.zeros_like(theta)
+# Create a 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+# Plot the circular orbit in 3D space
+ax.plot(x, y, z)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title(f'3D Circular Orbit Plot')
+ax.legend()
+8
+ax.grid(True, linestyle='--', alpha=0.5)
+ax.view_init(elev=20, azim=30)
+plt.show()
