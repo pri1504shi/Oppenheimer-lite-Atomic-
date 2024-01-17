@@ -1,0 +1,69 @@
+import numpy as np
+import scipy.integrate as integrate
+import matplotlib.pyplot as plt
+hbar = 1
+m = 1
+e = 1.6e-19
+Lx = 10
+Ly = 11
+x = np.linspace(0, Lx, 100)
+y = np.linspace(0, Ly, 100)
+Vo = 100
+
+# Define the unperturbed energy function
+def unperturbed_energy(nx, ny, Lx, Ly):
+  Ex = (hbar**2 * np.pi**2 * nx**2) / (2 * m * Lx**2)
+  Ey = (hbar**2 * np.pi**2 * ny**2) / (2 * m * Ly**2)
+  return Ex + Ey
+# Define the perturbing potential function V(x, y)
+def perturbing_potential(x, y):
+  return e*x*Vo
+# Function to calculate the integrand for the energy correction
+def integrand(x, y, nx, ny):
+  psi_unperturbed_x = np.sin(nx * np.pi * x / Lx)
+  psi_unperturbed_y = np.sin(ny * np.pi * y / Ly)
+  return psi_unperturbed_x * psi_unperturbed_y * perturbing_potential(x, y)
+
+# Create 2D arrays to store energy levels and corrected energies
+nx_values = [1, 2, 3] 
+ny_values = [1, 2, 3] 
+X, Y = np.meshgrid(x, y)
+E_grid = np.zeros_like(X)
+C_grid = np.zeros_like(X)
+
+for i, nx in enumerate(nx_values):
+  for j, ny in enumerate(ny_values):
+    if nx!=ny:
+      energy_correction, _ = integrate.dblquad(integrand, 0, Lx, 0, Ly, args=(nx, ny))
+      corrected_energy = unperturbed_energy(nx, ny,Lx,Ly) + energy_correction
+      C_grid[i, j] = corrected_energy  
+      E_grid[i, j] = unperturbed_energy(nx, ny, Lx, Ly)
+      print(f'For nx={nx}, ny={ny}:')
+      print('Correction:', energy_correction)
+      print(f'Unperturbed Energy : {unperturbed_energy(nx,ny,Lx,Ly)}')
+      print(f'Corrected Energy : {corrected_energy}')
+
+# Create 3D plots for the perturbation potential, unperturbed energy, and corrected energy
+fig = plt.figure(figsize=(12, 6))
+
+# Perturbation Potential
+ax1 = fig.add_subplot(131, projection='3d')
+ax1.plot_surface(X, Y, perturbing_potential(X, Y), cmap='viridis')
+ax1.set_title('Perturbation')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_zlabel('V(x, y)')
+
+# Plot Unperturbed and Corrected Energies in 2D Line Graphs
+plt.figure(figsize=(10, 5))
+
+for i, nx in enumerate(nx_values):
+  for j, ny in enumerate(ny_values):
+    if nx != ny:
+      plt.plot(x, C_grid[i, j] * np.ones_like(x), label=f'Corrected nx={nx}, ny={ny}')
+
+plt.title('Unperturbed and Corrected Energies')
+plt.xlabel('x')
+plt.ylabel('Energy')
+plt.legend()
+plt.show()
